@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 960d3a07afcdf4c4688caed120f01905, type: 3}
+  m_Name: Default
+  m_EditorClassIdentifier: 
+  autoUpdate: 1
+  GPUComputeMap: 1
+  GPUComputeErosion: 0
+  islandMask: 1
+  mode: 1
+  levelOfDetail: 0
+  seed: -270
+  scale: 170
+  octaves: 7
+  persistance: 0.3
+  lacunarity: 2.2
+  heightMult: 50
+  meshHeightCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  offset: {x: 0, y: 0}
+  majorOffset: {x: 0, y: 0}
+  voronoiFrequency: 2
+  voronoiOctaves: 1
+  voronoiPersistance: 0.5
+  voronoiLacunarity: 2
+  height: 2
+  width: 2
+  mapSize: 0
+  LODInfo:
+  - LOD: 0
+    viewerDistance: 350
+  - LOD: 1
+    viewerDistance: 800
+  - LOD: 4
+    viewerDistance: 1600
+  - LOD: 8
+    viewerDistance: 3200
+  Biomes:
+  - name: Plains
+    seed: 30
+    scale: 250
+    octaves: 7
+    persistance: 0.3
+    lacunarity: 2.2
+    offset: {x: 0, y: 0}
+    majorOffset: {x: 0, y: 0}
+  - name: Mountains
+    seed: 30
+    scale: 170
+    octaves: 7
+    persistance: 0.3
+    lacunarity: 2.1
+    offset: {x: 0, y: 0}
+    majorOffset: {x: 0, y: 0}
+  - name: Mesa
+    seed: 204
+    scale: 170
+    octaves: 7
+    persistance: 0.4
+    lacunarity: 2
+    offset: {x: 0, y: 0}
+    majorOffset: {x: 0, y: 0}
+  - name: Desert
+    seed: 50
+    scale: 70.85
+    octaves: 7
+    persistance: 0.4
+    lacunarity: 2
+    offset: {x: 0, y: 0}
+    majorOffset: {x: 0, y: 0}
+  - name: Hills
+    seed: 60
+    scale: 300
+    octaves: 7
+    persistance: 0.391
+    lacunarity: 2
+    offset: {x: 0, y: 0}
+    majorOffset: {x: 0, y: 0}
+  iterations: 50000
+  inertia: 0.05
+  gravity: 4
+  erosion: 1
+  erosionSeed: 20
+  evaporation: 0.01
+  maxPath: 64
+  deposition: 0.3
+  radius: 3
+  sedimentCapacityFactor: 4
+  minSedimentCapacity: 0.01
+  heightMap: {fileID: 7200000, guid: 0221341d49ab2954e813347be1725f65, type: 3}
+  erosionShader: {fileID: 7200000, guid: c12a729b05c079249a3f46db68b9b795, type: 3}
+  gradientShader: {fileID: 7200000, guid: 4a0589f81ad3afb4c98b95743cdb187e, type: 3}
+  voronoiShader: {fileID: 7200000, guid: ec6ddb63d1dc0f04aad247ef57c24b06, type: 3}
+  maskWeight: 3
+  tree: {fileID: 3839131800717968855, guid: 957b1b0465be2084aa07823ae2f79ea0, type: 3}
+  propParent: {fileID: 0}

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab3dada24176c427681208d0c4ae6b89, type: 3}
+  m_Name: Default
+  m_EditorClassIdentifier: 
+  sensitivity: 1
+  rotationSensitivity: 1
+  scrollSensitivity: 1
+  linearScrollSensitivity: 1
+  borderThickness: 10
+  panSpeed: 250
+  rotationSpeed: 200
+  scrollSpeed: 500
+  linearScrollSpeed: 5000
+  boostMult: 2
+  linearZoomMinMax: {x: 100, y: 500}
+  verticalZoomMinMax: {x: 5, y: 20}
+  mousePan: 0
+  mouseRotate: 0
+  sphericalZoom: 0
+  linearZoom: 1
+  focusMode: 0
+  smoothTimePan: 0.2
+  smoothTimeZoom: 0.2
+  smoothTimeRot: 0.2

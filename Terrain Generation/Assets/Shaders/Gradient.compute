@@ -1,0 +1,45 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+RWStructuredBuffer<float> mask;
+
+float size;
+float A;
+
+float Lerp(float a, float b, float t)
+{
+	return (1 - t) * a + (b * t);
+}
+
+float DistanceFromCenter(int x, int y, int center)
+{
+	float distanceX = x - center;
+	float distanceY = y - center;
+	float distance = sqrt(distanceX * distanceX + distanceY * distanceY);
+	return distance;
+	
+}
+
+[numthreads(1000,1,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	int center = size * 0.5;
+	
+	int x = id.x % size;
+	int y = id.x / size;
+	float distance = DistanceFromCenter(x, y, center);
+	float value;
+	if (distance == 0)
+	{
+		value = 0;
+	}
+	else
+	{
+		value = distance / center;
+	}
+    //value = pow(value, A)
+    float B = 1 / (A - 1);
+    value = B * (pow(value, abs(A)));
+	mask[id.x] = value;
+}

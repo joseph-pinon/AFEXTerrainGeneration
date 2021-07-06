@@ -1,0 +1,161 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+StructuredBuffer<float2> controlPoints;
+RWStructuredBuffer<float> map;
+StructuredBuffer<float2> octavesOffsets;
+
+int size;
+int gridSize;
+int gridLength;
+int octaves;
+float persistance;
+float lacunarity;
+
+float3 mod289(float3 x)
+{
+    return x - floor(x / 289.0) * 289.0;
+}
+float2 mod289(float2 x)
+{
+    return x - floor(x / 289.0) * 289.0;
+}
+
+float3 permute(float3 x)
+{
+    return mod289((x * 34.0 + 1.0) * x);
+}
+float2 cellular(float2 P)
+{
+    #define K 0.142857142857 // 1/7
+    #define Ko 0.428571428571 // 3/7
+    #define jitter 1.0 // Less gives more regular pattern
+    float2 Pi = fmod(floor(P), 289.0);
+    float2 Pf = frac(P);
+    float3 oi = float3(-1.0, 0.0, 1.0);
+    float3 of = float3(-0.5, 0.5, 1.5);
+    float3 px = permute(Pi.x + oi);
+    float3 p = permute(px.x + Pi.y + oi); // p11, p12, p13
+    float3 ox = float3(p * K) - Ko;
+    float3 oy = fmod(floor(p * K), 7.0) * K - Ko;
+    float3 dx = Pf.x + 0.5 + jitter * ox;
+    float3 dy = Pf.y - of + jitter * oy;
+    float3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
+    p = permute(px.y + Pi.y + oi); // p21, p22, p23
+    ox = frac(p * K) - Ko;
+    oy = fmod(floor(p * K), 7.0) * K - Ko;
+    dx = Pf.x - 0.5 + jitter * ox;
+    dy = Pf.y - of + jitter * oy;
+    float3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
+    p = permute(px.z + Pi.y + oi); // p31, p32, p33
+    ox = frac(p * K) - Ko;
+    oy = fmod(floor(p * K), 7.0) * K - Ko;
+    dx = Pf.x - 1.5 + jitter * ox;
+    dy = Pf.y - of + jitter * oy;
+    float3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
+	// Sort out the two smallest distances (F1, F2)
+    float3 d1a = min(d1, d2);
+    d2 = max(d1, d2); // Swap to keep candidates for F2
+    d2 = min(d2, d3); // neither F1 nor F2 are now in d3
+    d1 = min(d1a, d2); // F1 is now in d1
+    d2 = max(d1a, d2); // Swap to keep candidates for F2
+    d1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller
+    d1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x
+    d1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz
+    d1.y = min(d1.y, d1.z); // nor in  d1.z
+    d1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.
+    return sqrt(d1.xy);
+}
+float random(float2 v)
+{
+    return frac(sin(dot(v.xy,float2(12.9898, 78.233)))*43758.5453123);
+}
+
+float DistanceToFeatureInDirection(float2 direction, float x, float y, int gridX, int gridY)
+{
+    float cellX = gridX + direction.x;
+    float cellY = gridY + direction.y;
+    
+    if ((cellX < 0) || (cellX > gridLength - 1) || (cellY < 0) || (cellY > gridLength - 1))
+    {
+        return 1000000;
+    }
+    else
+    {
+        int pointIndex = (cellX * gridLength) + cellY;
+        float2 targetPoint = controlPoints[pointIndex];
+        //float rand = random(float2(gridX, gridY));
+        
+        float deltaX = x - targetPoint.x;
+        float deltaY = y - targetPoint.y;
+        float dst = sqrt(deltaX * deltaX + deltaY * deltaY);
+        return dst;
+    }
+}
+
+float GetClosestFeature(float x, float y, int gridX, int gridY)
+{
+    float minDist = 100000;
+    for (int dirX = -1; dirX <= 1; dirX++)
+    {
+        for (int dirY = -1; dirY <= 1; dirY++)
+        {
+            float2 direction = float2(dirX, dirY);
+            float dist = DistanceToFeatureInDirection(direction, x, y, gridX, gridY);
+            
+            if (dist < minDist)
+            {
+                minDist = dist;  
+            }
+        }
+    }
+    return minDist;
+}
+
+float FractalBrownianMotion(int x, int y)
+{
+    float value;
+    float amplitude = 1;
+    float frequency = 1;
+    
+    if (octaves < 0)
+    {
+        octaves = 0;
+    }
+    
+
+    for (int currentOctave = 0; currentOctave < octaves; currentOctave++)
+    {
+        float2 offset = octavesOffsets[currentOctave];
+        
+        float sampleX = x * frequency; //+ offset.x;
+        float sampleY = y * frequency; //+ offset.y;
+        
+        int gridX = sampleX / gridSize;
+        int gridY = sampleY / gridSize;
+        
+        //float cellularValue = GetClosestFeature(sampleX, sampleY, gridX, gridY)/gridSize;
+        float cellularValue = cellular(float2(sampleX, sampleY)/20).x;
+        value += cellularValue;
+        
+        amplitude *= persistance;
+        frequency *= lacunarity;
+    }
+    return value;
+};
+
+[numthreads(1024,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int x = id.x % size;
+    int y = id.x / size;
+    
+    
+    
+    //float minDist = GetClosestFeature(x, y, gridX, gridY) / (gridSize);
+    float value = FractalBrownianMotion(x, y);
+    map[id.x] = value;
+   
+}
